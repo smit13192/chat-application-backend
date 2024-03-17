@@ -1,0 +1,14 @@
+{
+  "name": "ms",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node build/server.js",
+    "dev": "tsc-watch --onSuccess \"npm start\""
+  },
+  "devDependencies": {
+    "tsc-watch": "^6.0.4",
+    "typescript": "^5.4.2"
+  }
+}
