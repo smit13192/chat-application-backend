@@ -1,10 +1,12 @@
 import { json, urlencoded } from "body-parser";
+import cors from "cors";
 import { PORT } from "./config/config";
 import { connectDatabase } from "./database";
 import router from "./router";
 import { app, server } from "./socket";
 
 connectDatabase();
+app.use(cors());
 app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(router);

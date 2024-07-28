@@ -13,7 +13,6 @@ export function asyncHandler(requestHandler: RequestHandler): RequestHandler {
                     message: e.message,
                 }));
             } else {
-                console.log(e);
                 return res.status(200).json(new ErrorResponse({
                     statusCode: 500,
                     message: "Something went wrong",

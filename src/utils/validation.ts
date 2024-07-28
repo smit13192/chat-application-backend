@@ -13,3 +13,14 @@ export const bodyValidation = (data: Schema) => {
         next();
     });
 }
+
+export const paramsValidation = (data: Schema) => {
+    return asyncHandler((req: Request, _res: Response, next: NextFunction) => {
+        const regex = new RegExp('\"', 'g');
+        const { error } = data.validate(req.params);
+        if (error) {
+            throw new ApiError(400, error.details[0].message.replace(regex, ''));
+        }
+        next();
+    });
+}

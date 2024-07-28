@@ -6,6 +6,8 @@ interface IMessage {
     message: string;
     sender: Types.ObjectId;
     chat: Types.ObjectId;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const messageSchema = new Schema<IMessage>({
@@ -41,4 +43,11 @@ export const messagePopulate: (string | PopulateOptions)[] = [
         path: 'chat',
         populate: chatPopulate,
     },
-]
+];
+
+export const messagePopulateWithoutChat: (string | PopulateOptions)[] = [
+    {
+        path: 'sender',
+        select: userSelect
+    }
+];

@@ -36,7 +36,8 @@ export const profile = asyncHandler(async (req, res) => {
 
 export const getAllUser = asyncHandler(async (req, res) => {
     const skip: number = parseInt((req.query.skip as string) || '0');
-    const users = await UserModel.find().skip(skip).limit(10).select(userSelect);
+    const id = (req as any).id;
+    const users = await UserModel.find({ _id: { $ne: id } }).skip(skip).limit(10).select(userSelect);
     res.status(200).json(new SuccessResponse({ statusCode: 200, data: users }));
 });
 

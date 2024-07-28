@@ -6,6 +6,8 @@ interface IUser {
     username: string;
     password: string;
     image?: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 interface IUserMethods {

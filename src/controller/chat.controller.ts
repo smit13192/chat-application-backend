@@ -1,5 +1,7 @@
 import ChatModel, { chatPopulate } from "../model/chat.model";
-import MessageModel, { messagePopulate } from "../model/message.model";
+import MessageModel, { messagePopulateWithoutChat } from "../model/message.model";
+import { io } from "../socket";
+import { ApiError } from "../utils/api.error";
 import { asyncHandler } from "../utils/async.handler";
 import { SuccessResponse } from "../utils/response";
 
@@ -39,6 +41,12 @@ export const getAllUserChat = asyncHandler(async (req, res) => {
 export const createGroup = asyncHandler(async (req, res) => {
     const { chatName, users } = req.body;
     const id = (req as any).user._id;
+
+    const findChat = await ChatModel.findOne({ chatName });
+    if (findChat) {
+        throw new ApiError(400, 'Group name already exist.');
+    }
+
     let chat = new ChatModel(
         {
             chatName,
@@ -61,7 +69,33 @@ export const sendMessage = asyncHandler(async (req, res) => {
         message
     });
     await messageModel.save({ validateBeforeSave: true });
-    await ChatModel.findByIdAndUpdate(chat, { $set: { lastMessage: messageModel._id } }, { new: true });
-    await messageModel.populate(messagePopulate);
+    const chatModel = await ChatModel.findByIdAndUpdate(chat, { $set: { lastMessage: messageModel._id } }, { new: true });
+    await messageModel.populate(messagePopulateWithoutChat);
+    chatModel?.users.forEach((user) => {
+        io.in(user.toString()).emit('new-message', messageModel);
+    });
     return res.status(200).json(new SuccessResponse({ statusCode: 200, data: messageModel, message: "Message send successfully" }));
+});
+
+export const getAllChatMessage = asyncHandler(async (req, res) => {
+    const { chat } = req.params;
+    let messageId: any = req.query.messageId;
+    let skip: any = req.query.skip;
+
+    const message = await MessageModel.findById(messageId);
+    if (!message) {
+        const messages = await MessageModel.find({ chat })
+            .sort({ createdAt: 'desc' })
+            .skip(skip)
+            .limit(100)
+            .populate(messagePopulateWithoutChat);
+        return res.status(200).json(new SuccessResponse({ statusCode: 200, data: messages, message: "Get all chat message" }));
+    }
+    
+    const messages = await MessageModel.find({ _id: { $lt: messageId }, chat })
+        .sort({ createdAt: 'desc' })
+        .limit(100).
+        populate(messagePopulateWithoutChat);
+    
+    return res.status(200).json(new SuccessResponse({ statusCode: 200, data: messages, message: "Get all chat message" }));
 });

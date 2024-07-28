@@ -8,6 +8,8 @@ interface IChat {
     users: [Schema.Types.ObjectId];
     groupAdmin?: Schema.Types.ObjectId;
     lastMessage?: Schema.Types.ObjectId;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const chatSchema = new Schema<IChat>({
@@ -39,7 +41,7 @@ chatSchema.path('chatName').validate(function () {
     return this.isGroupChat === true ? this.chatName != null : true;
 }, 'Group name is required');
 
-const ChatModel = model<IChat>('chats', chatSchema);
+const ChatModel = model('chats', chatSchema);
 export default ChatModel;
 
 
