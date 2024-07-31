@@ -26,7 +26,15 @@ export const login = asyncHandler(async (req, res) => {
         throw new ApiError(400, 'Password is wrong');
     }
     const token = generateToken(findUser._id.toString());
-    res.status(200).json(new SuccessResponse({ statusCode: 200, message: 'User logged in successfully', token }));
+
+    const user = await UserModel.findById(findUser._id).select("-password");
+
+    res.status(200).json(new SuccessResponse({
+        statusCode: 200, message: 'User logged in successfully', data: {
+            token,
+            user
+        }
+    }));
 });
 
 export const profile = asyncHandler(async (req, res) => {
@@ -36,8 +44,9 @@ export const profile = asyncHandler(async (req, res) => {
 
 export const getAllUser = asyncHandler(async (req, res) => {
     const skip: number = parseInt((req.query.skip as string) || '0');
+    const limit: number = parseInt((req.query.limit as string) || '10');
     const id = (req as any).id;
-    const users = await UserModel.find({ _id: { $ne: id } }).skip(skip).limit(10).select(userSelect);
+    const users = await UserModel.find({ _id: { $ne: id } }).skip(skip).limit(limit).select(userSelect);
     res.status(200).json(new SuccessResponse({ statusCode: 200, data: users }));
 });
 

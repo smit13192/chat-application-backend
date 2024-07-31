@@ -2,7 +2,6 @@ export interface ISuccess<T = any> {
     statusCode: number;
     message?: string;
     data?: T;
-    token?: string;
 }
 
 export class SuccessResponse<T = any> {
@@ -10,14 +9,12 @@ export class SuccessResponse<T = any> {
     statusCode: number;
     message?: string;
     data?: T;
-    token?: string;
 
     constructor(data: ISuccess) {
         this.statusCode = data.statusCode;
         this.success = true;
         this.message = data.message;
         this.data = data.data;
-        this.token = data.token;
     }
 }
 

@@ -1,4 +1,4 @@
-import { model, PopulateOptions, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 import { compareHash, hashPassword } from "../utils/hash";
 
 interface IUser {
@@ -27,11 +27,11 @@ const userSchema = new Schema<IUser, {}, IUserMethods>({
     },
     password: {
         type: String,
-        required: true
+        required: true,
     },
     image: {
         type: String,
-        default: null,
+        default: "https://cdn1.iconfinder.com/data/icons/bokbokstars-121-classic-stock-icons-1/512/person-man.png",
     }
 },
     { timestamps: true }
@@ -54,4 +54,4 @@ const UserModel = model('users', userSchema);
 
 export default UserModel;
 
-export const userSelect: string[] = ["username", "email", "image"];
+export const userSelect: string[] = ["username", "email", "image", "__v", "updatedAt", "createdAt"];

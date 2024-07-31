@@ -28,3 +28,7 @@ export const sendMessageValidation = Joi.object({
 export const getAllChatMessageValidation = Joi.object({
     chat: Joi.string().required(),
 });
+
+export const deleteMessageValidation = Joi.object({
+    messageId: Joi.string().required(),
+});

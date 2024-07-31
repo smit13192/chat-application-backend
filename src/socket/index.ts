@@ -7,13 +7,23 @@ const server = http.createServer(app);
 
 const io = new Server(server);
 
-const activeUser: string[] = []
+const activeUsers: { [key: string]: string } = {};
 
 io.on('connection', (socket) => {
     socket.on('send-user-id', (id) => {
-        activeUser.push(id);
-        io.emit('active-user', activeUser);
+        activeUsers[id] = socket.id;
+        const activeUserIds = Object.keys(activeUsers);
+        io.emit('active-user', activeUserIds);
         socket.join(id);
+    });
+
+    socket.on('disconnect', () => {
+        const userId = Object.keys(activeUsers).find(id => activeUsers[id] === socket.id);
+        if (userId) {
+            delete activeUsers[userId];
+            const activeUserIds = Object.keys(activeUsers);
+            io.emit('active-user', activeUserIds);
+        }
     });
 });
 

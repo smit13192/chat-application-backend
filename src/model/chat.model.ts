@@ -1,13 +1,12 @@
-import { model, ObjectId, PopulateOptions, Schema } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 import { userSelect } from "./user.model";
-import { messagePopulate } from "./message.model";
 
 interface IChat {
     chatName?: string;
     isGroupChat: boolean;
-    users: [Schema.Types.ObjectId];
-    groupAdmin?: Schema.Types.ObjectId;
-    lastMessage?: Schema.Types.ObjectId;
+    users: [Types.ObjectId];
+    groupAdmin?: Types.ObjectId;
+    lastMessage?: Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -47,11 +46,11 @@ export default ChatModel;
 
 export const chatPopulate = [
     {
-        path: 'groupAdmin', 
+        path: 'groupAdmin',
         select: userSelect
     },
     {
-        path: 'users', 
+        path: 'users',
         select: userSelect
     },
     {
