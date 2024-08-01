@@ -32,7 +32,7 @@ export const getAllUserChat = asyncHandler(async (req, res) => {
         users: { $elemMatch: { $eq: id } },
         $or: [
             { lastMessage: { $ne: null } },
-            { isGroupChat: true }
+            { isGroupChat: { $eq: true } },
         ]
     })
         .sort({ updatedAt: -1 })
@@ -137,7 +137,7 @@ export const deleteMessage = asyncHandler(async (req, res) => {
     }
     await deleteMessage.populate(messagePopulateWithoutChat);
 
-    const chatModel = await ChatModel.findById(deleteMessage.chat).populate(chatPopulate);
+    let chatModel = await ChatModel.findById(deleteMessage.chat).populate(chatPopulate);
     if (chatModel) {
         if (!chatModel.lastMessage) {
             chatModel.lastMessage = undefined;
@@ -148,8 +148,9 @@ export const deleteMessage = asyncHandler(async (req, res) => {
                 chatModel.lastMessage = messages[0]._id;
             }
             await chatModel.save();
+            chatModel = await ChatModel.findById(chatModel._id).populate(chatPopulate);
         }
-        const chatUsers = chatModel.users.map((user) => (user as any)._id.toString());
+        const chatUsers = chatModel?.users.map((user) => (user as any)._id.toString()) ?? [];
         if (chatUsers) {
             io.in(chatUsers).emit('delete-message', {
                 chat: chatModel,

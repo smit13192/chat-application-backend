@@ -7,6 +7,7 @@ interface IChat {
     users: [Types.ObjectId];
     groupAdmin?: Types.ObjectId;
     lastMessage?: Types.ObjectId;
+    groupImage: String;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -31,6 +32,10 @@ const chatSchema = new Schema<IChat>({
     lastMessage: {
         type: Schema.Types.ObjectId,
         ref: 'messages'
+    },
+    groupImage: {
+        type: String,
+        default: 'https://img.freepik.com/free-photo/happy-young-people-enjoying-dinner-together_23-2148454104.jpg?size=626&ext=jpg'
     }
 },
     { timestamps: true }
