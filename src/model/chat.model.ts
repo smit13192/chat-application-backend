@@ -35,7 +35,7 @@ const chatSchema = new Schema<IChat>({
     },
     groupImage: {
         type: String,
-        default: 'https://img.freepik.com/free-photo/happy-young-people-enjoying-dinner-together_23-2148454104.jpg?size=626&ext=jpg'
+        default: 'uploads/kakashi.jpeg'
     }
 },
     { timestamps: true }

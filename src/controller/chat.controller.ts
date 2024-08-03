@@ -65,13 +65,14 @@ export const createGroup = asyncHandler(async (req, res) => {
 });
 
 export const sendMessage = asyncHandler(async (req, res) => {
-    const { chat, message } = req.body;
+    const { chat, message, replyToMessage } = req.body;
     const id = (req as any).user._id;
 
     let messageModel = new MessageModel({
         chat,
         sender: id,
-        message
+        message,
+        replyToMessage,
     });
 
     await messageModel.save({ validateBeforeSave: true });
@@ -91,6 +92,7 @@ export const sendMessage = asyncHandler(async (req, res) => {
 export const getAllChatMessage = asyncHandler(async (req, res) => {
     const { chat } = req.params;
     let lastMessageId: any = req.query.lastMessageId;
+    let firstMessageId: any = req.query.firstMessageId;
     let skip: any = req.query.skip;
     let limit: number = parseInt((req.query.limit as string) || '100');
 
@@ -100,19 +102,50 @@ export const getAllChatMessage = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Chat is not exist.");
     }
 
-    let message;
+    let findLastMessage;
+    let findFirstMessage;
 
-    if (lastMessageId) {
-        message = await MessageModel.findById(lastMessageId);
+    if (firstMessageId) {
+        console.log(firstMessageId);
+        findFirstMessage = await MessageModel.findById(firstMessageId);
+        if (findFirstMessage) {
+            const messages = await MessageModel.find({ _id: { $gt: firstMessageId }, chat })
+                .sort({ createdAt: 'desc' }).
+                populate(messagePopulateWithoutChat);
+
+            return res.status(200).json(new SuccessResponse({
+                statusCode: 200,
+                data: {
+                    chat: chatModel,
+                    messages,
+                    isFirst: true,
+                    isLast: false,
+                    isFromMain: false
+                }, message: "Get all chat message"
+            }));
+        }
     }
 
-    if (!message) {
+    if (lastMessageId) {
+        findLastMessage = await MessageModel.findById(lastMessageId);
+    }
+
+    if (!findLastMessage) {
         const messages = await MessageModel.find({ chat })
             .sort({ createdAt: 'desc' })
             .skip(skip)
             .limit(limit)
             .populate(messagePopulateWithoutChat);
-        return res.status(200).json(new SuccessResponse({ statusCode: 200, data: { chat: chatModel, messages }, message: "Get all chat message" }));
+        return res.status(200).json(new SuccessResponse({
+            statusCode: 200,
+            data: {
+                chat: chatModel,
+                messages,
+                isFirst: false,
+                isLast: false,
+                isFromMain: true
+            }, message: "Get all chat message"
+        }));
     }
 
     const messages = await MessageModel.find({ _id: { $lt: lastMessageId }, chat })
@@ -120,7 +153,16 @@ export const getAllChatMessage = asyncHandler(async (req, res) => {
         .limit(limit).
         populate(messagePopulateWithoutChat);
 
-    return res.status(200).json(new SuccessResponse({ statusCode: 200, data: { chat: chatModel, messages }, message: "Get all chat message" }));
+    return res.status(200).json(new SuccessResponse({
+        statusCode: 200,
+        data: {
+            chat: chatModel,
+            messages,
+            isFirst: false,
+            isLast: true,
+            isFromMain: false
+        }, message: "Get all chat message"
+    }));
 });
 
 export const deleteMessage = asyncHandler(async (req, res) => {

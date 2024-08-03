@@ -31,7 +31,7 @@ const userSchema = new Schema<IUser, {}, IUserMethods>({
     },
     image: {
         type: String,
-        default: "https://cdn1.iconfinder.com/data/icons/bokbokstars-121-classic-stock-icons-1/512/person-man.png",
+        default: "uploads/kakashi.jpeg",
     }
 },
     { timestamps: true }

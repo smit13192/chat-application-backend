@@ -1,6 +1,7 @@
 import UserModel, { userSelect } from "../model/user.model";
 import { ApiError } from "../utils/api.error";
 import { asyncHandler } from "../utils/async.handler";
+import { deleteFile } from "../utils/file";
 import { generateToken } from "../utils/generate.token";
 import { SuccessResponse } from "../utils/response";
 
@@ -40,6 +41,28 @@ export const login = asyncHandler(async (req, res) => {
 export const profile = asyncHandler(async (req, res) => {
     const user = (req as any).user;
     res.status(200).json(new SuccessResponse({ statusCode: 200, data: user, message: "User profile get successfully" }));
+});
+
+export const updateProfile = asyncHandler(async (req, res) => {
+    const user = (req as any).user;
+    const image = (req as any).file;
+    const { username } = req.body;
+    const findUser = await UserModel.findOne({ username }).select("-password");
+    if (findUser && findUser._id.toString() !== user._id.toString()) {
+        if (image) deleteFile(image);
+        throw new ApiError(400, 'Username already exist');
+    }
+    if (image) {
+        deleteFile(user.image);
+        user.image = image.path;
+    }
+    user.username = username ?? user.username;
+    await user.save({ validateBeforeSave: true });
+    res.status(200).json(new SuccessResponse({
+        statusCode: 200,
+        message: 'User profile updated successfully',
+        data: user,
+    }));
 });
 
 export const getAllUser = asyncHandler(async (req, res) => {
