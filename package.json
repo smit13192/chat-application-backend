@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node build/server.js",
+    "build": "tsc",
     "dev": "tsc-watch --onSuccess \"npm start\""
   },
   "devDependencies": {
