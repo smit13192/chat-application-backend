@@ -106,7 +106,6 @@ export const getAllChatMessage = asyncHandler(async (req, res) => {
     let findFirstMessage;
 
     if (firstMessageId) {
-        console.log(firstMessageId);
         findFirstMessage = await MessageModel.findById(firstMessageId);
         if (findFirstMessage) {
             const messages = await MessageModel.find({ _id: { $gt: firstMessageId }, chat })
