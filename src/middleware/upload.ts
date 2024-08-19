@@ -1,8 +1,9 @@
 import fs from 'fs';
 import multer, { diskStorage } from 'multer';
 import { ApiError } from '../utils/api.error';
+import { Request } from 'express';
 
-const fileFilter = (_req: any, file: any, callback: any) => {
+const fileFilter = (_req: Request, file: Express.Multer.File , callback: any) => {
     if (file.mimetype === "image/jpg" ||
         file.mimetype === "image/jpeg" ||
         file.mimetype === "image/png") {
