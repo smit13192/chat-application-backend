@@ -65,7 +65,7 @@ export const createGroup = asyncHandler(async (req, res) => {
 });
 
 export const sendMessage = asyncHandler(async (req, res) => {
-    const { chat, message, replyToMessage } = req.body;
+    const { chat, message, replyToMessage, messageIv } = req.body;
     const id = (req as any).user._id;
 
     let messageModel = new MessageModel({
@@ -73,6 +73,7 @@ export const sendMessage = asyncHandler(async (req, res) => {
         sender: id,
         message,
         replyToMessage,
+        messageIv,
     });
 
     await messageModel.save({ validateBeforeSave: true });

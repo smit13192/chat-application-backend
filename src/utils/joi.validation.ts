@@ -23,7 +23,8 @@ export const createGroupValidation = Joi.object({
 export const sendMessageValidation = Joi.object({
     chat: Joi.string().required(),
     message: Joi.string().required(),
-    replyToMessage: Joi.string(),
+    messageIv: Joi.string().required(),
+    replyToMessage: Joi.string().allow(null),
 });
 
 export const getAllChatMessageValidation = Joi.object({

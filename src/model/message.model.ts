@@ -7,6 +7,7 @@ interface IMessage {
     sender: Types.ObjectId;
     chat: Types.ObjectId;
     replyToMessage: Types.ObjectId;
+    messageIv: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -31,6 +32,10 @@ const messageSchema = new Schema<IMessage>({
         type: Schema.Types.ObjectId,
         ref: 'messages',
         default: null,
+    },
+    messageIv: {
+        type: String,
+        required: true,
     }
 },
     { timestamps: true }
@@ -49,6 +54,11 @@ export const messagePopulate: (string | PopulateOptions)[] = [
         path: 'chat',
         populate: chatPopulate,
     },
+    {
+        path: 'replyToMessage',
+        populate: [{ path: 'sender', select: userSelect }],
+        select: "-replyToMessage"
+    }
 ];
 
 export const messagePopulateWithoutChat: (string | PopulateOptions)[] = [
